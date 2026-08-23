@@ -130,3 +130,10 @@ class ProductDetail(ProductRead):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+
+class AssetRead(BaseModel):
+    filename: str
+    url: str
+    content_type: str
+    size: int

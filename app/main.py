@@ -1,9 +1,12 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.api import router
+from app.assets import router as assets_router
 from app.config import settings
 from app.database import Base, engine
 
@@ -28,6 +31,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(router, prefix="/api/v1")
+app.include_router(assets_router, prefix="/api/v1")
+Path(settings.upload_dir).mkdir(parents=True, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=settings.upload_dir), name="uploads")
 
 
 @app.get("/", tags=["system"])

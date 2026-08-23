@@ -75,3 +75,25 @@ def test_writes_require_admin() -> None:
         json={"name": "汽车", "slug": "cars"},
     )
     assert response.status_code == 401
+
+
+def test_upload_asset() -> None:
+    response = client.post(
+        "/api/v1/assets",
+        files={"file": ("cover.png", b"fake-png-content", "image/png")},
+        headers=auth_headers(),
+    )
+    assert response.status_code == 201
+    payload = response.json()
+    assert payload["url"].startswith("/uploads/")
+    assert payload["size"] == len(b"fake-png-content")
+    Path("uploads", payload["filename"]).unlink(missing_ok=True)
+
+
+def test_upload_rejects_unsupported_type() -> None:
+    response = client.post(
+        "/api/v1/assets",
+        files={"file": ("notes.txt", b"nope", "text/plain")},
+        headers=auth_headers(),
+    )
+    assert response.status_code == 415

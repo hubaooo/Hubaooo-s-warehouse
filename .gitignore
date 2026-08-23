@@ -4,6 +4,7 @@ __pycache__/
 .ruff_cache/
 .venv/
 *.egg-info/
+uploads/
 .env
 warehouse.db
 *.sqlite3

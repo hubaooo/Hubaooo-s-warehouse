@@ -48,9 +48,13 @@ uvicorn app.main:app --reload
 | POST | `/api/v1/products` | 新增产品 |
 | POST | `/api/v1/products/{id}/parts` | 新增零件 |
 | POST | `/api/v1/products/{id}/connections` | 新增装配关系 |
+| POST | `/api/v1/assets` | 上传图片或 GLB 模型 |
 
 所有写入、修改和删除接口都需要管理员 Bearer Token。先运行
 `python -m app.create_admin` 创建管理员，再在 `/docs` 的 **Authorize** 中登录。
+
+本地上传的文件保存在 `uploads/`，默认上限为 50 MB。上线时将替换为对象存储，
+避免服务器重启或重新部署时丢失素材。
 
 ## 接下来建议
 

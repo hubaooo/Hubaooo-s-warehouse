@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:3000,http://localhost:5173"
     jwt_secret: str = "development-only-change-this-secret-key"
     access_token_expire_minutes: int = 120
+    upload_dir: str = "uploads"
+    max_upload_mb: int = 50
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
