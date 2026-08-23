@@ -8,6 +8,8 @@
 - 产品：名称、品牌、简介、封面、整机 3D 模型
 - 零件：说明、功能原理、材质、独立 3D 模型、初始变换参数
 - 装配关系：零件之间的先后/连接关系和操作提示
+- 权威溯源：零件官方英文名、资料链接和核验状态
+- 拆解步骤：目标零件、工具、安全提示、步骤来源和核验状态
 - 爆炸图布局：组装位置、拆解位置、主结构轴、拆解层级和吸附容差
 - Swagger / OpenAPI 文档
 - SQLite 本地开发；可切换 PostgreSQL
@@ -49,6 +51,7 @@ uvicorn app.main:app --reload
 | POST | `/api/v1/products` | 新增产品 |
 | POST | `/api/v1/products/{id}/parts` | 新增零件 |
 | POST | `/api/v1/products/{id}/connections` | 新增装配关系 |
+| POST | `/api/v1/products/{id}/disassembly-steps` | 新增有来源的拆解步骤 |
 | POST | `/api/v1/assets` | 上传图片或 GLB 模型 |
 
 所有写入、修改和删除接口都需要管理员 Bearer Token。先运行
@@ -60,10 +63,14 @@ uvicorn app.main:app --reload
 每个零件分别保存 `transform`（组装状态）和 `exploded_transform`（爆炸状态）。
 前端在两组变换之间做动画插值，即可保持统一方向、真实比例和有逻辑的逐层拆解。
 
+示例 iPhone 15 数据来自 Apple 维修手册、内部视图和可订购零件清单。名称和步骤来源可追溯，
+但 3D 几何模型将独立重建，不应表述为 Apple 官方 CAD 模型。详细原则见
+[`docs/model-sourcing.md`](docs/model-sourcing.md)。
+
 ## 接下来建议
 
-1. 管理员登录和内容管理后台
+1. 管理后台的来源审核与步骤编辑界面
 2. GLB/图片文件直传对象存储
-3. 装配步骤、卡扣点、碰撞规则和完成判定
+3. 卡扣点、碰撞规则和完成判定
 4. 搜索、收藏与学习进度
 5. Alembic 数据库迁移和正式部署

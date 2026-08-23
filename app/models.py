@@ -57,6 +57,9 @@ class Product(Base):
     connections: Mapped[list["AssemblyConnection"]] = relationship(
         back_populates="product", cascade="all, delete-orphan"
     )
+    disassembly_steps: Mapped[list["DisassemblyStep"]] = relationship(
+        back_populates="product", cascade="all, delete-orphan", order_by="DisassemblyStep.step_order"
+    )
 
 
 class Part(Base):
@@ -82,6 +85,9 @@ class Part(Base):
     explosion_level: Mapped[int] = mapped_column(default=0)
     display_group: Mapped[str | None] = mapped_column(String(80))
     is_detachable: Mapped[bool] = mapped_column(Boolean, default=True)
+    official_name: Mapped[str | None] = mapped_column(String(160))
+    source_url: Mapped[str | None] = mapped_column(Text)
+    verification_status: Mapped[str] = mapped_column(String(40), default="unverified")
     sort_order: Mapped[int] = mapped_column(default=0)
 
     product: Mapped[Product] = relationship(back_populates="parts")
@@ -103,3 +109,22 @@ class AssemblyConnection(Base):
     product: Mapped[Product] = relationship(back_populates="connections")
     source_part: Mapped[Part] = relationship(foreign_keys=[source_part_id])
     target_part: Mapped[Part] = relationship(foreign_keys=[target_part_id])
+
+
+class DisassemblyStep(Base):
+    __tablename__ = "disassembly_steps"
+    __table_args__ = (UniqueConstraint("product_id", "step_order"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), index=True)
+    target_part_id: Mapped[int | None] = mapped_column(ForeignKey("parts.id"))
+    step_order: Mapped[int] = mapped_column()
+    title: Mapped[str] = mapped_column(String(160))
+    instruction: Mapped[str] = mapped_column(Text)
+    tool: Mapped[str | None] = mapped_column(String(200))
+    safety_notice: Mapped[str | None] = mapped_column(Text)
+    source_url: Mapped[str] = mapped_column(Text)
+    verification_status: Mapped[str] = mapped_column(String(40), default="official")
+
+    product: Mapped[Product] = relationship(back_populates="disassembly_steps")
+    target_part: Mapped[Part | None] = relationship()

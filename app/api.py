@@ -8,12 +8,14 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.auth import AdminRequired, create_access_token, verify_password
 from app.database import get_db
-from app.models import Admin, AssemblyConnection, Category, Part, Product
+from app.models import Admin, AssemblyConnection, Category, DisassemblyStep, Part, Product
 from app.schemas import (
     CategoryCreate,
     CategoryRead,
     ConnectionCreate,
     ConnectionRead,
+    DisassemblyStepCreate,
+    DisassemblyStepRead,
     PartCreate,
     PartRead,
     PartUpdate,
@@ -139,6 +141,7 @@ def get_product(slug: str, db: Session = Depends(get_db)) -> Product:
             selectinload(Product.category),
             selectinload(Product.parts),
             selectinload(Product.connections),
+            selectinload(Product.disassembly_steps),
         )
     )
     product = db.scalar(statement)
@@ -218,3 +221,28 @@ def create_connection(
     commit_or_conflict(db, "该装配关系已存在")
     db.refresh(connection)
     return connection
+
+
+@router.post(
+    "/products/{product_id}/disassembly-steps",
+    response_model=DisassemblyStepRead,
+    status_code=status.HTTP_201_CREATED,
+    tags=["assembly"],
+)
+def create_disassembly_step(
+    product_id: int,
+    payload: DisassemblyStepCreate,
+    _: AdminRequired,
+    db: Session = Depends(get_db),
+) -> DisassemblyStep:
+    if db.get(Product, product_id) is None:
+        raise HTTPException(status_code=404, detail="产品不存在")
+    if payload.target_part_id is not None:
+        part = db.get(Part, payload.target_part_id)
+        if part is None or part.product_id != product_id:
+            raise HTTPException(status_code=422, detail="目标零件必须属于当前产品")
+    step = DisassemblyStep(product_id=product_id, **payload.model_dump())
+    db.add(step)
+    commit_or_conflict(db, "该步骤序号已存在")
+    db.refresh(step)
+    return step

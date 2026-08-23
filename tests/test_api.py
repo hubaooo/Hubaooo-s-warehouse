@@ -67,6 +67,7 @@ def test_create_and_read_product() -> None:
     assert detail.status_code == 200
     assert detail.json()["category"]["slug"] == "digital-devices"
     assert detail.json()["parts"] == []
+    assert detail.json()["disassembly_steps"] == []
 
     part = client.post(
         f"/api/v1/products/{product.json()['id']}/parts",
@@ -85,6 +86,21 @@ def test_create_and_read_product() -> None:
     )
     assert part.status_code == 201
     assert part.json()["explosion_level"] == 3
+
+    step = client.post(
+        f"/api/v1/products/{product.json()['id']}/disassembly-steps",
+        json={
+            "target_part_id": part.json()["id"],
+            "step_order": 1,
+            "title": "移除显示屏",
+            "instruction": "按维修手册释放显示屏粘合剂。",
+            "source_url": "https://support.apple.com/en-us/104900",
+            "verification_status": "apple-manual-derived",
+        },
+        headers=auth_headers(),
+    )
+    assert step.status_code == 201
+    assert step.json()["target_part_id"] == part.json()["id"]
 
 
 def test_writes_require_admin() -> None:

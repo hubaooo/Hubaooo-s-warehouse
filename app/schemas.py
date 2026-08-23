@@ -83,6 +83,9 @@ class PartCreate(BaseModel):
     explosion_level: int = Field(default=0, ge=0)
     display_group: str | None = Field(default=None, max_length=80)
     is_detachable: bool = True
+    official_name: str | None = Field(default=None, max_length=160)
+    source_url: str | None = None
+    verification_status: str = Field(default="unverified", max_length=40)
     sort_order: int = 0
 
 
@@ -102,6 +105,9 @@ class PartUpdate(BaseModel):
     explosion_level: int | None = Field(default=None, ge=0)
     display_group: str | None = Field(default=None, max_length=80)
     is_detachable: bool | None = None
+    official_name: str | None = Field(default=None, max_length=160)
+    source_url: str | None = None
+    verification_status: str | None = Field(default=None, max_length=40)
     sort_order: int | None = None
 
 
@@ -121,6 +127,9 @@ class PartRead(ORMModel):
     explosion_level: int
     display_group: str | None
     is_detachable: bool
+    official_name: str | None
+    source_url: str | None
+    verification_status: str
     sort_order: int
 
 
@@ -144,10 +153,35 @@ class ConnectionRead(ORMModel):
     snap_tolerance: float
 
 
+class DisassemblyStepCreate(BaseModel):
+    target_part_id: int | None = None
+    step_order: int = Field(ge=1)
+    title: str = Field(min_length=1, max_length=160)
+    instruction: str = Field(min_length=1)
+    tool: str | None = Field(default=None, max_length=200)
+    safety_notice: str | None = None
+    source_url: str
+    verification_status: str = Field(default="official", max_length=40)
+
+
+class DisassemblyStepRead(ORMModel):
+    id: int
+    product_id: int
+    target_part_id: int | None
+    step_order: int
+    title: str
+    instruction: str
+    tool: str | None
+    safety_notice: str | None
+    source_url: str
+    verification_status: str
+
+
 class ProductDetail(ProductRead):
     category: CategoryRead
     parts: list[PartRead]
     connections: list[ConnectionRead]
+    disassembly_steps: list[DisassemblyStepRead]
 
 
 class Token(BaseModel):
