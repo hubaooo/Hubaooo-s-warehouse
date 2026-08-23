@@ -21,6 +21,8 @@ python -m venv .venv
 source .venv/bin/activate
 
 pip install -e ".[dev]"
+alembic upgrade head
+python -m app.create_admin
 python -m app.seed
 uvicorn app.main:app --reload
 ```
@@ -46,6 +48,9 @@ uvicorn app.main:app --reload
 | POST | `/api/v1/products` | 新增产品 |
 | POST | `/api/v1/products/{id}/parts` | 新增零件 |
 | POST | `/api/v1/products/{id}/connections` | 新增装配关系 |
+
+所有写入、修改和删除接口都需要管理员 Bearer Token。先运行
+`python -m app.create_admin` 创建管理员，再在 `/docs` 的 **Authorize** 中登录。
 
 ## 接下来建议
 

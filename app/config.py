@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     app_env: str = "development"
     database_url: str = "sqlite:///./warehouse.db"
     cors_origins: str = "http://localhost:3000,http://localhost:5173"
+    jwt_secret: str = "development-only-change-this-secret-key"
+    access_token_expire_minutes: int = 120
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

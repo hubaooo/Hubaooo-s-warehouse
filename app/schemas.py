@@ -31,6 +31,19 @@ class ProductCreate(BaseModel):
     is_published: bool = False
 
 
+class ProductUpdate(BaseModel):
+    category_id: int | None = None
+    name: str | None = Field(default=None, min_length=1, max_length=160)
+    slug: str | None = Field(
+        default=None, pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$", max_length=160
+    )
+    brand: str | None = None
+    summary: str | None = None
+    cover_image_url: str | None = None
+    model_3d_url: str | None = None
+    is_published: bool | None = None
+
+
 class ProductRead(ORMModel):
     id: int
     category_id: int
@@ -60,6 +73,20 @@ class PartCreate(BaseModel):
         }
     )
     sort_order: int = 0
+
+
+class PartUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=160)
+    slug: str | None = Field(
+        default=None, pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$", max_length=160
+    )
+    description: str | None = None
+    working_principle: str | None = None
+    material: str | None = None
+    model_3d_url: str | None = None
+    image_url: str | None = None
+    transform: dict | None = None
+    sort_order: int | None = None
 
 
 class PartRead(ORMModel):
@@ -98,3 +125,8 @@ class ProductDetail(ProductRead):
     category: CategoryRead
     parts: list[PartRead]
     connections: list[ConnectionRead]
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
