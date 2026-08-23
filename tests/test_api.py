@@ -68,6 +68,24 @@ def test_create_and_read_product() -> None:
     assert detail.json()["category"]["slug"] == "digital-devices"
     assert detail.json()["parts"] == []
 
+    part = client.post(
+        f"/api/v1/products/{product.json()['id']}/parts",
+        json={
+            "name": "显示屏总成",
+            "slug": "display-assembly",
+            "explosion_axis": "z",
+            "explosion_level": 3,
+            "exploded_transform": {
+                "position": [0, 0, 1.8],
+                "rotation": [0, 0, 0],
+                "scale": [1, 1, 1],
+            },
+        },
+        headers=auth_headers(),
+    )
+    assert part.status_code == 201
+    assert part.json()["explosion_level"] == 3
+
 
 def test_writes_require_admin() -> None:
     response = client.post(

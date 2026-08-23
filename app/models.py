@@ -1,6 +1,16 @@
 from datetime import datetime
 
-from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, String, Text, UniqueConstraint, func
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    DateTime,
+    Float,
+    ForeignKey,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -65,6 +75,13 @@ class Part(Base):
     transform: Mapped[dict] = mapped_column(
         JSON, default=lambda: {"position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]}
     )
+    exploded_transform: Mapped[dict] = mapped_column(
+        JSON, default=lambda: {"position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]}
+    )
+    explosion_axis: Mapped[str] = mapped_column(String(10), default="z")
+    explosion_level: Mapped[int] = mapped_column(default=0)
+    display_group: Mapped[str | None] = mapped_column(String(80))
+    is_detachable: Mapped[bool] = mapped_column(Boolean, default=True)
     sort_order: Mapped[int] = mapped_column(default=0)
 
     product: Mapped[Product] = relationship(back_populates="parts")
@@ -81,6 +98,7 @@ class AssemblyConnection(Base):
     connection_type: Mapped[str] = mapped_column(String(80), default="attach")
     instruction: Mapped[str | None] = mapped_column(Text)
     step_order: Mapped[int] = mapped_column(default=0)
+    snap_tolerance: Mapped[float] = mapped_column(Float, default=0.08)
 
     product: Mapped[Product] = relationship(back_populates="connections")
     source_part: Mapped[Part] = relationship(foreign_keys=[source_part_id])

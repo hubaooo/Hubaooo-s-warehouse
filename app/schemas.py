@@ -72,6 +72,17 @@ class PartCreate(BaseModel):
             "scale": [1, 1, 1],
         }
     )
+    exploded_transform: dict = Field(
+        default_factory=lambda: {
+            "position": [0, 0, 0],
+            "rotation": [0, 0, 0],
+            "scale": [1, 1, 1],
+        }
+    )
+    explosion_axis: str = Field(default="z", pattern=r"^[xyz]$|^-[xyz]$")
+    explosion_level: int = Field(default=0, ge=0)
+    display_group: str | None = Field(default=None, max_length=80)
+    is_detachable: bool = True
     sort_order: int = 0
 
 
@@ -86,6 +97,11 @@ class PartUpdate(BaseModel):
     model_3d_url: str | None = None
     image_url: str | None = None
     transform: dict | None = None
+    exploded_transform: dict | None = None
+    explosion_axis: str | None = Field(default=None, pattern=r"^[xyz]$|^-[xyz]$")
+    explosion_level: int | None = Field(default=None, ge=0)
+    display_group: str | None = Field(default=None, max_length=80)
+    is_detachable: bool | None = None
     sort_order: int | None = None
 
 
@@ -100,6 +116,11 @@ class PartRead(ORMModel):
     model_3d_url: str | None
     image_url: str | None
     transform: dict
+    exploded_transform: dict
+    explosion_axis: str
+    explosion_level: int
+    display_group: str | None
+    is_detachable: bool
     sort_order: int
 
 
@@ -109,6 +130,7 @@ class ConnectionCreate(BaseModel):
     connection_type: str = Field(default="attach", max_length=80)
     instruction: str | None = None
     step_order: int = 0
+    snap_tolerance: float = Field(default=0.08, gt=0, le=1)
 
 
 class ConnectionRead(ORMModel):
@@ -119,6 +141,7 @@ class ConnectionRead(ORMModel):
     connection_type: str
     instruction: str | None
     step_order: int
+    snap_tolerance: float
 
 
 class ProductDetail(ProductRead):

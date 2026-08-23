@@ -34,6 +34,10 @@ def seed() -> None:
             slug="display-assembly",
             description="负责显示画面并接收触控输入。",
             working_principle="OLED 像素自发光，触控层感知手指位置。",
+            exploded_transform={"position": [0, 0, 1.8], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+            explosion_axis="z",
+            explosion_level=3,
+            display_group="外壳与显示组件",
             sort_order=1,
         )
         battery = Part(
@@ -42,6 +46,10 @@ def seed() -> None:
             slug="battery",
             description="为整机提供电能。",
             working_principle="锂离子在正负极之间移动，实现充电与放电。",
+            exploded_transform={"position": [0, 0, 0.7], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+            explosion_axis="z",
+            explosion_level=2,
+            display_group="内部组件",
             sort_order=2,
         )
         frame = Part(
@@ -50,6 +58,10 @@ def seed() -> None:
             slug="mid-frame",
             description="固定内部零件并提供结构强度。",
             material="铝合金",
+            exploded_transform={"position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+            explosion_axis="z",
+            explosion_level=1,
+            display_group="主结构",
             sort_order=3,
         )
         db.add_all([screen, battery, frame])
